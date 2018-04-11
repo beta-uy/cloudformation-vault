@@ -324,7 +324,60 @@
             }
           ]
         }
+          },
+          "Type": "AWS::CloudFormation::Stack",
+          "Metadata": {
+              "AWS::CloudFormation::Designer": {
+                  "id": "c00ffd3a-3893-402d-9c1d-79c980878d6d"
+              }
+          }
+      },
+      "HashiCorpVaultLoadBalancer": {
+          "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+          "DependsOn": [
+              "HashiCorpVaultStack",
+              "VPCStack"
+          ],
+          "Properties": {
+              "Subnets": [
+                  { "Fn::ImportValue" : { "Fn::Sub" : ["${VPCStackName}-PrivateSubnet1AID", { "VPCStackName": { "Fn::GetAtt": ["VPCStack", "StackName"] } }] } },
+                  { "Fn::ImportValue" : { "Fn::Sub" : ["${VPCStackName}-PrivateSubnet2AID", { "VPCStackName": { "Fn::GetAtt": ["VPCStack", "StackName"] } }] } },
+                  { "Fn::ImportValue" : { "Fn::Sub" : ["${VPCStackName}-PrivateSubnet3AID", { "VPCStackName": { "Fn::GetAtt": ["VPCStack", "StackName"] } }] } }
+              ],
+              "Listeners": [
+                {
+                  "InstancePort": "8200",
+                  "LoadBalancerPort": "8200",
+                  "Protocol": "TCP"
+                }
+              ],
+              "HealthCheck": {
+                  "HealthyThreshold": 10,
+                  "Interval": 30,
+                  "Target": "TCP:8200",
+                  "Timeout": 5,
+                  "UnhealthyThreshold": 2
+              },
+              "Scheme": "internal",
+              "Instances": [
 
+              ],
+              "Tags": [
+                  {
+                      "Key": "Name",
+                      "Value": {
+                          "Fn::Join": [
+                              "-",
+                              [
+                                  {
+                                      "Ref": "AWS::StackName"
+      },
+                                  "ELB"
+                              ]
+                          ]
+                      }
+                  }
+              ]
       },
       "Type": "AWS::CloudFormation::Stack"
     },
