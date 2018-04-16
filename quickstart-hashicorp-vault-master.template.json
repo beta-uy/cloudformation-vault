@@ -3,48 +3,53 @@
   "Description": "Hashicorp Consul+Vault, License: Apache 2.0 (Please do not remove) May,17,2016",
   "Metadata": {
     "AWS::CloudFormation::Interface": {
-      "ParameterGroups": [{
-        "Label": {
-          "default": " VPC Network Configuration"
+      "ParameterGroups": [
+        {
+          "Label": {
+            "default": " VPC Network Configuration"
+          },
+          "Parameters": [
+            "AvailabilityZones",
+            "VPCCIDR",
+            "PrivateSubnet1CIDR",
+            "PrivateSubnet2CIDR",
+            "PrivateSubnet3CIDR",
+            "PublicSubnet1CIDR",
+            "PublicSubnet2CIDR",
+            "PublicSubnet3CIDR",
+            "AccessCIDR"
+          ]
         },
-        "Parameters": [
-          "AvailabilityZones",
-          "VPCCIDR",
-          "PrivateSubnet1CIDR",
-          "PrivateSubnet2CIDR",
-          "PrivateSubnet3CIDR",
-          "PublicSubnet1CIDR",
-          "PublicSubnet2CIDR",
-          "PublicSubnet3CIDR",
-          "AccessCIDR"
-        ]
-      }, {
-        "Label": {
-          "default": "Vault Setup"
+        {
+          "Label": {
+            "default": "Vault Setup"
+          },
+          "Parameters": [
+            "EmailAddress",
+            "KeyPairName",
+            "VaultInstanceType"
+          ]
         },
-        "Parameters": [
-          "EmailAddress",
-          "KeyPairName",
-          "VaultInstanceType"
-        ]
-      }, {
-        "Label": {
-          "default": "Consul Setup"
+        {
+          "Label": {
+            "default": "Consul Setup"
+          },
+          "Parameters": [
+            "ConsulClientNodes",
+            "ConsulServerNodes",
+            "ConsulInstanceType"
+          ]
         },
-        "Parameters": [
-          "ConsulClientNodes",
-          "ConsulServerNodes",
-          "ConsulInstanceType"
-        ]
-      }, {
-        "Label": {
-          "default": "AWS Quick Start Configuration"
-        },
-        "Parameters": [
-          "QSS3BucketName",
-          "QSS3KeyPrefix"
-        ]
-      }],
+        {
+          "Label": {
+            "default": "AWS Quick Start Configuration"
+          },
+          "Parameters": [
+            "QSS3BucketName",
+            "QSS3KeyPrefix"
+          ]
+        }
+      ],
       "ParameterLabels": {
         "AvailabilityZones": {
           "default": "Availability Zones"
@@ -176,7 +181,11 @@
     "ConsulServerNodes": {
       "Type": "String",
       "Description": "Sets DesiredCapacity and MaxSize ",
-      "AllowedValues": ["3", "5", "7"],
+      "AllowedValues": [
+        "3",
+        "5",
+        "7"
+      ],
       "Default": "3"
     },
     "ConsulClientNodes": {
@@ -267,7 +276,8 @@
   },
   "Conditions": {
     "GovCloudCondition": {
-      "Fn::Equals": [{
+      "Fn::Equals": [
+        {
           "Ref": "AWS::Region"
         },
         "us-gov-west-1"
@@ -280,7 +290,8 @@
         "Parameters": {
           "AvailabilityZones": {
             "Fn::Join": [
-              ",", {
+              ",",
+              {
                 "Ref": "AvailabilityZones"
               }
             ]
@@ -313,7 +324,8 @@
         },
         "TemplateURL": {
           "Fn::Sub": [
-            "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-aws-vpc/templates/aws-vpc.template", {
+            "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-aws-vpc/templates/aws-vpc.template",
+            {
               "QSS3Region": {
                 "Fn::If": [
                   "GovCloudCondition",
@@ -324,62 +336,101 @@
             }
           ]
         }
-          },
-          "Type": "AWS::CloudFormation::Stack",
-          "Metadata": {
-              "AWS::CloudFormation::Designer": {
-                  "id": "c00ffd3a-3893-402d-9c1d-79c980878d6d"
-              }
-          }
       },
-      "HashiCorpVaultLoadBalancer": {
-          "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
-          "DependsOn": [
-              "HashiCorpVaultStack",
-              "VPCStack"
-          ],
-          "Properties": {
-              "Subnets": [
-                  { "Fn::ImportValue" : { "Fn::Sub" : ["${VPCStackName}-PrivateSubnet1AID", { "VPCStackName": { "Fn::GetAtt": ["VPCStack", "StackName"] } }] } },
-                  { "Fn::ImportValue" : { "Fn::Sub" : ["${VPCStackName}-PrivateSubnet2AID", { "VPCStackName": { "Fn::GetAtt": ["VPCStack", "StackName"] } }] } },
-                  { "Fn::ImportValue" : { "Fn::Sub" : ["${VPCStackName}-PrivateSubnet3AID", { "VPCStackName": { "Fn::GetAtt": ["VPCStack", "StackName"] } }] } }
-              ],
-              "Listeners": [
+      "Type": "AWS::CloudFormation::Stack",
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "c00ffd3a-3893-402d-9c1d-79c980878d6d"
+        }
+      }
+    },
+    "HashiCorpVaultLoadBalancer": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "DependsOn": [
+        "HashiCorpVaultStack",
+        "VPCStack"
+      ],
+      "Properties": {
+        "Subnets": [
+          {
+            "Fn::ImportValue": {
+              "Fn::Sub": [
+                "${VPCStackName}-PrivateSubnet1AID",
                 {
-                  "InstancePort": "8200",
-                  "LoadBalancerPort": "8200",
-                  "Protocol": "TCP"
-                }
-              ],
-              "HealthCheck": {
-                  "HealthyThreshold": 10,
-                  "Interval": 30,
-                  "Target": "TCP:8200",
-                  "Timeout": 5,
-                  "UnhealthyThreshold": 2
-              },
-              "Scheme": "internal",
-              "Instances": [
-
-              ],
-              "Tags": [
-                  {
-                      "Key": "Name",
-                      "Value": {
-                          "Fn::Join": [
-                              "-",
-                              [
-                                  {
-                                      "Ref": "AWS::StackName"
-      },
-                                  "ELB"
-                              ]
-                          ]
-                      }
+                  "VPCStackName": {
+                    "Fn::GetAtt": [
+                      "VPCStack",
+                      "StackName"
+                    ]
                   }
+                }
               ]
-      },
-      "Type": "AWS::CloudFormation::Stack"
+            }
+          },
+          {
+            "Fn::ImportValue": {
+              "Fn::Sub": [
+                "${VPCStackName}-PrivateSubnet2AID",
+                {
+                  "VPCStackName": {
+                    "Fn::GetAtt": [
+                      "VPCStack",
+                      "StackName"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Fn::ImportValue": {
+              "Fn::Sub": [
+                "${VPCStackName}-PrivateSubnet3AID",
+                {
+                  "VPCStackName": {
+                    "Fn::GetAtt": [
+                      "VPCStack",
+                      "StackName"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "Listeners": [
+          {
+            "InstancePort": "8200",
+            "LoadBalancerPort": "8200",
+            "Protocol": "TCP"
+          }
+        ],
+        "HealthCheck": {
+          "HealthyThreshold": 10,
+          "Interval": 30,
+          "Target": "TCP:8200",
+          "Timeout": 5,
+          "UnhealthyThreshold": 2
+        },
+        "Scheme": "internal",
+        "Instances": [],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "-",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "ELB"
+                ]
+              ]
+            }
+          }
+        ]
+      }
     },
     "LinuxBastionHostStack": {
       "DependsOn": "VPCStack",
@@ -407,7 +458,8 @@
           },
           "QSS3KeyPrefix": {
             "Fn::Sub": [
-              "${QSS3KeyPrefix}submodules/quickstart-linux-bastion/", {
+              "${QSS3KeyPrefix}submodules/quickstart-linux-bastion/",
+              {
                 "QSS3KeyPrefix": {
                   "Ref": "QSS3KeyPrefix"
                 }
@@ -426,7 +478,8 @@
         },
         "TemplateURL": {
           "Fn::Sub": [
-            "https://${QSS3BucketName}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-linux-bastion/templates/linux-bastion.template", {
+            "https://${QSS3BucketName}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-linux-bastion/templates/linux-bastion.template",
+            {
               "S3Region": {
                 "Fn::If": [
                   "GovCloudCondition",
@@ -533,7 +586,8 @@
           },
           "QSS3KeyPrefix": {
             "Fn::Sub": [
-              "${QSS3KeyPrefix}submodules/quickstart-hashicorp-consul/", {
+              "${QSS3KeyPrefix}submodules/quickstart-hashicorp-consul/",
+              {
                 "QSS3KeyPrefix": {
                   "Ref": "QSS3KeyPrefix"
                 }
@@ -543,7 +597,8 @@
         },
         "TemplateURL": {
           "Fn::Sub": [
-            "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-hashicorp-consul/templates/quickstart-hashicorp-consul.template", {
+            "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-hashicorp-consul/templates/quickstart-hashicorp-consul.template",
+            {
               "QSS3Region": {
                 "Fn::If": [
                   "GovCloudCondition",
@@ -554,7 +609,6 @@
             }
           ]
         }
-
       },
       "Type": "AWS::CloudFormation::Stack"
     },
@@ -564,7 +618,8 @@
       "Properties": {
         "TemplateURL": {
           "Fn::Sub": [
-            "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/quickstart-hashicorp-vault.template", {
+            "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/quickstart-hashicorp-vault.template",
+            {
               "QSS3Region": {
                 "Fn::If": [
                   "GovCloudCondition",
