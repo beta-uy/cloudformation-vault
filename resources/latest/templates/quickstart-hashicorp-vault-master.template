@@ -272,6 +272,11 @@
         "i2.8xlarge"
       ],
       "ConstraintDescription": "Choose an instance type. m4.large or larger recommended."
+    },
+    "VaultDownloadURL": {
+      "Type": "String",
+      "Description": "The URL to download the Vault zip file ",
+      "Default": "https://releases.hashicorp.com/vault/0.7.0/vault_0.7.0_linux_amd64.zip"
     }
   },
   "Conditions": {
@@ -673,6 +678,9 @@
           },
           "VaultInstanceType": {
             "Ref": "VaultInstanceType"
+          },
+          "VaultDownloadURL": {
+            "Ref": "VaultDownloadURL"
           }
         }
       }
