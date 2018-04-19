@@ -353,49 +353,22 @@
       "Properties": {
         "Subnets": [
           {
-            "Fn::ImportValue": {
-              "Fn::Sub": [
-                "${VPCStackName}-PrivateSubnet1AID",
-                {
-                  "VPCStackName": {
-                    "Fn::GetAtt": [
-                      "VPCStack",
-                      "StackName"
-                    ]
-                  }
-                }
-              ]
-            }
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.PrivateSubnet1AID"
+            ]
           },
           {
-            "Fn::ImportValue": {
-              "Fn::Sub": [
-                "${VPCStackName}-PrivateSubnet2AID",
-                {
-                  "VPCStackName": {
-                    "Fn::GetAtt": [
-                      "VPCStack",
-                      "StackName"
-                    ]
-                  }
-                }
-              ]
-            }
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.PrivateSubnet2AID"
+            ]
           },
           {
-            "Fn::ImportValue": {
-              "Fn::Sub": [
-                "${VPCStackName}-PrivateSubnet3AID",
-                {
-                  "VPCStackName": {
-                    "Fn::GetAtt": [
-                      "VPCStack",
-                      "StackName"
-                    ]
-                  }
-                }
-              ]
-            }
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.PrivateSubnet3AID"
+            ]
           }
         ],
         "Listeners": [
@@ -415,34 +388,16 @@
         "Scheme": "internal",
         "Instances": [
           {
-            "Fn::ImportValue": {
-              "Fn::Sub": [
-                "${HashiCorpVaultStackName}-Vault1InstanceId",
-                {
-                  "HashiCorpVaultStackName": {
-                    "Fn::GetAtt": [
-                      "HashiCorpVaultStack",
-                      "StackName"
-                    ]
-                  }
-                }
-              ]
-            }
+            "Fn::GetAtt": [
+              "HashiCorpVaultStack",
+              "Outputs.Vault1InstanceId"
+            ]
           },
           {
-            "Fn::ImportValue": {
-              "Fn::Sub": [
-                "${HashiCorpVaultStackName}-Vault2InstanceId",
-                {
-                  "HashiCorpVaultStackName": {
-                    "Fn::GetAtt": [
-                      "HashiCorpVaultStack",
-                      "StackName"
-                    ]
-                  }
-                }
-              ]
-            }
+            "Fn::GetAtt": [
+              "HashiCorpVaultStack",
+              "Outputs.Vault2InstanceId"
+            ]
           }
         ],
         "Tags": [
