@@ -651,7 +651,7 @@
                   "Fn::Join": [
                     "",
                     [
-                      "./tmp/bastion_bootstrap.sh",
+                      "/tmp/bastion_bootstrap.sh",
                       " --banner ",
                       {
                         "Ref": "BastionBanner"
@@ -764,6 +764,7 @@
                   "Ref": "BastionMainLogGroup"
                 },
                 "\n",
+                "apt install -y awscli\n",
                 "cfn-init -v --stack ",
                 {
                   "Ref": "AWS::StackName"
