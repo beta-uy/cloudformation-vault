@@ -413,7 +413,38 @@
           "UnhealthyThreshold": 2
         },
         "Scheme": "internal",
-        "Instances": [],
+        "Instances": [
+          {
+            "Fn::ImportValue": {
+              "Fn::Sub": [
+                "${HashiCorpVaultStackName}-Vault1InstanceId",
+                {
+                  "HashiCorpVaultStackName": {
+                    "Fn::GetAtt": [
+                      "HashiCorpVaultStack",
+                      "StackName"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Fn::ImportValue": {
+              "Fn::Sub": [
+                "${HashiCorpVaultStackName}-Vault2InstanceId",
+                {
+                  "HashiCorpVaultStackName": {
+                    "Fn::GetAtt": [
+                      "HashiCorpVaultStack",
+                      "StackName"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ],
         "Tags": [
           {
             "Key": "Name",

@@ -993,6 +993,24 @@
           "PrivateIp"
         ]
       }
+    },
+    "Vault1InstanceId": {
+      "Description": "Vault Node #1 Instance ID",
+      "Value": {
+        "Ref": "Vault1"
+      },
+      "Export": {
+        "Name": "Vault1InstanceId"
+      }
+    },
+    "Vault2InstanceId": {
+      "Description": "Vault Node #2 Instance ID",
+      "Value": {
+        "Ref": "Vault2"
+      },
+      "Export": {
+        "Name": "Vault2InstanceId"
+      }
     }
   }
 }
