@@ -764,6 +764,14 @@
                   "Ref": "BastionMainLogGroup"
                 },
                 "\n",
+                "sudo apt-get install -y libpam-google-authenticator\n",
+                "runuser -l ubuntu -c 'google-authenticator -t -r 3 -R 30 -w 3 -d -f -s /home/ubuntu/.google_authenticator'\n",
+                "printf \"\nauth required pam_google_authenticator.so\n\" | tee -a /etc/pam.d/sshd\n",
+                "sed -i 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/' /etc/ssh/sshd_config\n",
+                "printf \"\nAuthenticationMethods publickey,password publickey,keyboard-interactive\n\" | tee -a /etc/ssh/sshd_config\n",
+                "sed -i 's/@include common-auth/# @include common-auth/' /etc/pam.d/sshd\n",
+                "systemctl restart --no-block sshd.service\n",
+                "\n",
                 "apt install -y awscli\n",
                 "cfn-init -v --stack ",
                 {
